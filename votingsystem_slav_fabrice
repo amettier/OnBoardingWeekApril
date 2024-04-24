@@ -1,0 +1,109 @@
+import subprocess
+
+# Install tabulate
+subprocess.check_call(["python", "-m", "pip", "install", "tabulate"])
+
+# Now you can import and use tabulate
+from tabulate import tabulate
+
+
+class Candidate:
+    def __init__(self, _id, name, vote_count):
+        self.id = _id
+        self.name = name
+        self.vote_count = vote_count
+
+
+class VotingSystem:
+    def __init__(self):
+        self.candidates = {}
+        self.candidates_count = 0
+        self.voters = {}
+
+    def add_candidate(self, _name):
+        self.candidates_count += 1
+        self.candidates[self.candidates_count] = Candidate(self.candidates_count, _name, 0)
+
+    def vote(self, _candidate_id, voter_address):
+        if self.voters.get(voter_address):
+            raise Exception("Voter has already voted.")
+        if _candidate_id <= 0 or _candidate_id > self.candidates_count:
+            raise Exception("Invalid candidate ID.")
+        self.voters[voter_address] = True
+        self.candidates[_candidate_id].vote_count += 1
+
+    def get_winner(self):
+        winning_vote_count = 0
+        winning_candidate_ids = []
+        for i in range(1, self.candidates_count + 1):
+            if self.candidates[i].vote_count > winning_vote_count:
+                winning_vote_count = self.candidates[i].vote_count
+                winning_candidate_ids = [i]
+            elif self.candidates[i].vote_count == winning_vote_count:
+                winning_candidate_ids.append(i)
+        return winning_candidate_ids
+
+    def enough_votes_cast(self, threshold_percentage):
+        total_votes = len(self.voters)
+        if total_votes == 0:
+            return False
+        total_candidates = self.candidates_count
+        expected_votes = total_votes * threshold_percentage / 100
+        if len(self.get_winner()) == 1:  # If there's a single winner
+            return total_candidates >= expected_votes
+        else:
+            return False
+
+
+# Example usage:
+voting_system = VotingSystem()
+voting_system.add_candidate("Alice")
+voting_system.add_candidate("Bob")
+voting_system.add_candidate("Sven")
+
+# Simulating votes
+voting_system.vote(1, "voter1")
+voting_system.vote(2, "voter2")
+voting_system.vote(1, "voter3")
+voting_system.vote(2, "voter4")  # This creates a tie between Alice and Bob
+voting_system.vote(3, "voter5")
+voting_system.vote(1, "voter6")
+voting_system.vote(2, "voter7")
+
+# Determining the winner
+winners = voting_system.get_winner()
+total_votes = len(voting_system.voters)
+
+if len(winners) == 1:
+    winner_id = winners[0]
+    winner_name = voting_system.candidates[winner_id].name
+    winner_vote_percentage = (voting_system.candidates[winner_id].vote_count / total_votes) * 100
+    result_table = [["Winner", winner_name, f"{winner_vote_percentage:.2f}%"]]
+    other_candidates = []
+    place = 2
+    for i in range(1, voting_system.candidates_count + 1):
+        if i != winner_id:
+            candidate_name = voting_system.candidates[i].name
+            candidate_vote_percentage = (voting_system.candidates[i].vote_count / total_votes) * 100
+            other_candidates.append([f"{place}. Place", candidate_name, f"{candidate_vote_percentage:.2f}%"])
+            place += 1
+    if other_candidates:
+        result_table.extend(other_candidates)
+    print(tabulate(result_table, headers=["Outcome", "Candidate", "Percentage of Votes"]))
+else:
+    print("There is a tie between the following candidates:")
+    tie_candidates = []
+    for winner_id in winners:
+        candidate_name = voting_system.candidates[winner_id].name
+        candidate_vote_percentage = (voting_system.candidates[winner_id].vote_count / total_votes) * 100
+        tie_candidates.append([candidate_name, f"{candidate_vote_percentage:.2f}%"])
+    print(tabulate(tie_candidates, headers=["Candidate", "Percentage of Votes"]))
+    other_candidates = []
+    for i in range(1, voting_system.candidates_count + 1):
+        if i not in winners:
+            candidate_name = voting_system.candidates[i].name
+            candidate_vote_percentage = (voting_system.candidates[i].vote_count / total_votes) * 100
+            other_candidates.append([candidate_name, f"{candidate_vote_percentage:.2f}%"])
+    if other_candidates:
+        print("\nOther candidates have received the following percentages of votes:")
+        print(tabulate(other_candidates, headers=["Candidate", "Percentage of Votes"]))
