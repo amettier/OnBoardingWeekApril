@@ -1,0 +1,62 @@
+class Candidate:
+    def __init__(self, id, name):
+        self.id = id
+        self.name = name
+        self.vote_count = 0
+
+class VotingSystem:
+    def __init__(self):
+        self.candidates = {}
+        self.candidates_count = 0
+        self.voters = set()
+
+    def add_candidate(self, name):
+        self.candidates_count += 1
+        candidate = Candidate(self.candidates_count, name)
+        self.candidates[self.candidates_count] = candidate
+
+    def vote(self, candidate_id, voter_address):
+        if voter_address in self.voters:
+            print("Voter has already voted.")
+            return
+        if candidate_id < 1 or candidate_id > self.candidates_count:
+            print("Invalid candidate ID.")
+            return
+
+        self.voters.add(voter_address)
+        self.candidates[candidate_id].vote_count += 1
+        print(f"Vote for candidate {candidate_id} registered.")
+
+    def get_winner(self):
+        winning_candidate_id = None
+        winning_vote_count = 0
+        for candidate_id, candidate in self.candidates.items():
+            if candidate.vote_count > winning_vote_count:
+                winning_vote_count = candidate.vote_count
+                winning_candidate_id = candidate_id
+        return winning_candidate_id
+
+    def enough_votes_for_decision(self, required_percentage):
+        total_votes = sum(candidate.vote_count for candidate in self.candidates.values())
+        total_voters = len(self.voters)
+        if total_voters == 0:
+            return False
+        percentage = (total_votes / total_voters) * 100
+        return percentage >= required_percentage
+
+# Beispielverwendung
+voting_system = VotingSystem()
+voting_system.add_candidate("Alice")
+voting_system.add_candidate("Bob")
+
+voting_system.vote(1, "0x1234")
+voting_system.vote(2, "0x5678")
+voting_system.vote(1, "0x9abc")
+voting_system.vote(2, "0xdef0")
+voting_system.vote(1, "0x5678")
+
+if voting_system.enough_votes_for_decision(60):
+    print("Enough votes have been cast for a decision.")
+else:
+    print("Not enough votes have been cast for a decision yet.")
+
