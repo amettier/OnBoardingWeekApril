@@ -2,4 +2,9 @@ He geil wie ihrs mached
 De igor nimmts wunder
 Nei nimmts ihn ned!
 Oder doch?
+<<<<<<< HEAD
 Wük?
+=======
+Wük?
+Test
+>>>>>>> a971f9b0e5d50760aec552bed362a9746270bd8d
