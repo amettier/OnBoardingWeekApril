@@ -1,9 +1,3 @@
-Hello new joiners
-Lets try to pull these changes!!
-He geil wie ihrs mached
-
-pull this!!
-Its pulled...
 class Candidate:
     def __init__(self, id, name):
         self.id = id
@@ -42,6 +36,10 @@ class VotingSystem:
                 winning_candidate_id = candidate_id
         return winning_candidate_id
 
+    def enough_votes_for_decision(self, min_votes_required):
+        total_votes = sum(candidate.vote_count for candidate in self.candidates.values())
+        return total_votes >= min_votes_required
+
 # Beispielverwendung
 voting_system = VotingSystem()
 voting_system.add_candidate("Alice")
@@ -51,12 +49,9 @@ voting_system.vote(1, "0x1234")
 voting_system.vote(2, "0x5678")
 voting_system.vote(1, "0x9abc")
 voting_system.vote(2, "0xdef0")
-voting_system.vote(1, "0x1234")  # Versuch, erneut zu wählen
+voting_system.vote(1, "0x5678")
 
-winner_id = voting_system.get_winner()
-if winner_id:
-    print(f"The winner is candidate {winner_id}.")
+if voting_system.enough_votes_for_decision(6):
+    print("Enough votes have been cast for a decision.")
 else:
-    print("No winner yet.")
-
-
+    print("Not enough votes have been cast for a decision yet.")

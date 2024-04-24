@@ -1,9 +1,3 @@
-Hello new joiners
-Lets try to pull these changes!!
-He geil wie ihrs mached
-
-pull this!!
-Its pulled...
 class Candidate:
     def __init__(self, id, name):
         self.id = id
@@ -58,5 +52,3 @@ if winner_id:
     print(f"The winner is candidate {winner_id}.")
 else:
     print("No winner yet.")
-
-
