@@ -36,13 +36,9 @@ class VotingSystem:
                 winning_candidate_id = candidate_id
         return winning_candidate_id
 
-    def enough_votes_for_decision(self, required_percentage):
+    def enough_votes_for_decision(self, min_votes_required):
         total_votes = sum(candidate.vote_count for candidate in self.candidates.values())
-        total_voters = len(self.voters)
-        if total_voters == 0:
-            return False
-        percentage = (total_votes / total_voters) * 100
-        return percentage >= required_percentage
+        return total_votes >= min_votes_required
 
 # Beispielverwendung
 voting_system = VotingSystem()
@@ -55,8 +51,7 @@ voting_system.vote(1, "0x9abc")
 voting_system.vote(2, "0xdef0")
 voting_system.vote(1, "0x5678")
 
-if voting_system.enough_votes_for_decision(60):
+if voting_system.enough_votes_for_decision(6):
     print("Enough votes have been cast for a decision.")
 else:
     print("Not enough votes have been cast for a decision yet.")
-
